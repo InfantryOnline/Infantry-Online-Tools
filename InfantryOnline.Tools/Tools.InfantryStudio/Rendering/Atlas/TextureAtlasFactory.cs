@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,14 @@ namespace Tools.InfantryStudio.Rendering.Atlas
 
             openList.Add(new TextureAtlas {Id = atlasId++ });
 
-            foreach(var bitmap in orderedBitmaps)
+            var cachePath = Path.Combine(Directory.GetCurrentDirectory(), "cache", cacheFolder);
+
+            if (!Directory.Exists(cachePath))
+            {
+                Directory.CreateDirectory(cachePath);
+            }
+
+            foreach (var bitmap in orderedBitmaps)
             {
                 bool foundSpace = false;
 
@@ -87,7 +95,9 @@ namespace Tools.InfantryStudio.Rendering.Atlas
                         }
                     }
 
-                    b.Save($"{cacheFolder}_{atlas.Id}.png", ImageFormat.Png);
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "cache", cacheFolder, $"{atlas.Id}.png");
+
+                    b.Save(path, ImageFormat.Png);
 
                     openList.Remove(atlas);
                 }
@@ -108,9 +118,9 @@ namespace Tools.InfantryStudio.Rendering.Atlas
                     }
                 }
 
-                b.Save($"{cacheFolder}_{atlas.Id}.png", ImageFormat.Png);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "cache", cacheFolder, $"{atlas.Id}.png");
 
-                openList.Remove(atlas);
+                b.Save(path, ImageFormat.Png);
             }
 
             output.AddRange(openList);
