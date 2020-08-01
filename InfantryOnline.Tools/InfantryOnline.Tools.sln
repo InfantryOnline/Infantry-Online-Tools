@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.Infantry.FileFormats
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gibbed.IO", "Tools.External\Gibbed\Gibbed.IO\Gibbed.IO.csproj", "{047857BA-DAA3-4CA7-AFB8-A1B082B28C6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.LvbRebase", "Tools.LvbRebase\Tools.LvbRebase.csproj", "{6E6BCBE3-DAE7-4705-AA09-97BBC4448FC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{047857BA-DAA3-4CA7-AFB8-A1B082B28C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{047857BA-DAA3-4CA7-AFB8-A1B082B28C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{047857BA-DAA3-4CA7-AFB8-A1B082B28C6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E6BCBE3-DAE7-4705-AA09-97BBC4448FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E6BCBE3-DAE7-4705-AA09-97BBC4448FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E6BCBE3-DAE7-4705-AA09-97BBC4448FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E6BCBE3-DAE7-4705-AA09-97BBC4448FC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
