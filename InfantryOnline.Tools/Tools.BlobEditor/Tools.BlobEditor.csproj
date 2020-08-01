@@ -101,13 +101,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Tools.External\Gibbed.Infantry\Gibbed.Infantry.FileFormats\Gibbed.Infantry.FileFormats.csproj">
+    <ProjectReference Include="..\Tools.External\Gibbed\Gibbed.Infantry.FileFormats\Gibbed.Infantry.FileFormats.csproj">
       <Project>{c2e5d029-0766-4d2e-a559-cb74a800d204}</Project>
       <Name>Gibbed.Infantry.FileFormats</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tools.External\Gibbed.Infantry\Gibbed.IO\Gibbed.IO.csproj">
+    <ProjectReference Include="..\Tools.External\Gibbed\Gibbed.IO\Gibbed.IO.csproj">
       <Project>{047857ba-daa3-4ca7-afb8-a1b082b28c6a}</Project>
       <Name>Gibbed.IO</Name>
     </ProjectReference>
