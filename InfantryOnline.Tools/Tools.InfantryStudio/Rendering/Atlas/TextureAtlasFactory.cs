@@ -22,11 +22,8 @@ namespace Tools.InfantryStudio.Rendering.Atlas
         /// <returns></returns>
         public static List<TextureAtlas> CreateAtlassesFromCfsBitmaps(RenderingDevice device, List<CfsBitmap> bitmaps, string cacheFolder)
         {
-            // Big warning: we ignore the BlobFilename in DistinctBy because we have many blobs where assets repeat,
-            // so we assume if the name is the same, that the asset is the same.
-
             var orderedBitmaps = bitmaps
-                .DistinctBy(b => b.CfsFilename + "#" + b.FrameIndex)
+                .DistinctBy(b => b.BloFilename + "#" + b.CfsFilename + "#" + b.FrameIndex)
                 .OrderByDescending(b => (b.SpriteFile.Width * b.SpriteFile.Height))
                 .ToList();
 

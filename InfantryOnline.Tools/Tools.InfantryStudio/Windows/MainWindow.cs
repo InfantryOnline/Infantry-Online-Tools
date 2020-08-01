@@ -102,9 +102,7 @@ namespace Tools.InfantryStudio
 
                         foreach(var atlas in Renderer.FloorAtlasses)
                         {
-                            // Warning: We aren't checking Blobs because of duplicate entries in some blobs; just the CFS.
-
-                            var foundCfs = atlas.Entries.FirstOrDefault(entry => entry.CfsBitmap.CfsFilename == cfsName);
+                            var foundCfs = atlas.Entries.FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName && entry.CfsBitmap.CfsFilename == cfsName);
 
                             if (foundCfs != null)
                             {
@@ -139,9 +137,9 @@ namespace Tools.InfantryStudio
 
                     foreach (var atlas in Renderer.ObjectAtlasses)
                     {
-                        // Warning: We aren't checking Blobs because of duplicate entries in some blobs; just the CFS.
                         var foundCfs = atlas.Entries
-                            .FirstOrDefault(entry => entry.CfsBitmap.CfsFilename == cfsName
+                            .FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName
+                            && entry.CfsBitmap.CfsFilename == cfsName
                             && entry.CfsBitmap.FrameIndex == entity.FrameIndex);
 
                         if (foundCfs != null)
