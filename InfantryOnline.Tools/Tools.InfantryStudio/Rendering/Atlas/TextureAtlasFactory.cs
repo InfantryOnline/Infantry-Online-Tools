@@ -22,7 +22,7 @@ namespace Tools.InfantryStudio.Rendering.Atlas
         public static List<TextureAtlas> CreateAtlassesFromCfsBitmaps(RenderingDevice device, List<CfsBitmap> bitmaps)
         {
             var orderedBitmaps = bitmaps
-                .DistinctBy(b => b.BloFilename + "#" + b.CfsFilename)
+                .DistinctBy(b => b.BloFilename + "#" + b.CfsFilename + "#" + b.FrameIndex)
                 .OrderByDescending(b => (b.SpriteFile.Width * b.SpriteFile.Height))
                 .ToList();
 
@@ -46,6 +46,7 @@ namespace Tools.InfantryStudio.Rendering.Atlas
                         atlas.Entries.Add(entry);
 
                         foundSpace = true;
+                        break;
                     }
                 }
 
