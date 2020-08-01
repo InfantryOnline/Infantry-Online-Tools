@@ -104,19 +104,7 @@ namespace Tools.InfantryStudio.Assets
 
             // Next, parse all the frames.
 
-            var frameCount = 1;
-
-            if (sprite.RowMeaning != 0)
-            {
-                frameCount = sprite.Frames.Count();
-            }
-
-            if (sprite.Frames.Count() == 0)
-            {
-                frameCount = 0;
-            }
-
-            for (var i = 0; i < frameCount; i++)
+            for (var i = 0; i < sprite.Frames.Count(); i++)
             {
                 var frame = sprite.Frames[i];
 
@@ -147,8 +135,8 @@ namespace Tools.InfantryStudio.Assets
                 {
                     Bitmap = bitmap,
                     FrameIndex = i,
-                    BloFilename = blobName,
-                    CfsFilename = cfsName,
+                    BloFilename = blobName.ToLower().Trim(),
+                    CfsFilename = cfsName.ToLower().Trim(),
                     SpriteFile = sprite
                 });
             }

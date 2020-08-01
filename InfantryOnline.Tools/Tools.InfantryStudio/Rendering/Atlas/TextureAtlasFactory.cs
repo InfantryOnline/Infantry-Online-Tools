@@ -94,6 +94,26 @@ namespace Tools.InfantryStudio.Rendering.Atlas
 
                 output.AddRange(lockedAtlassses);
             }
+
+            foreach (var atlas in openList)
+            {
+                var b = new Bitmap(2048, 2048);
+
+                using (var gr = Graphics.FromImage(b))
+                {
+                    foreach (var entry in atlas.Entries)
+                    {
+                        gr.DrawImage(entry.CfsBitmap.Bitmap, entry.X, entry.Y);
+                        entry.CfsBitmap.Bitmap = null; // No longer needed, free it up.
+                    }
+                }
+
+                b.Save($"{cacheFolder}_{atlas.Id}.png", ImageFormat.Png);
+
+                openList.Remove(atlas);
+            }
+
+            output.AddRange(openList);
             
             return output;
         }

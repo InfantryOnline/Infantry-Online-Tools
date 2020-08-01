@@ -64,21 +64,6 @@ namespace Tools.InfantryStudio
 
                 file.Deserialize(stream);
 
-                // Preallocate all the atlasses needed for this level based on the references.
-
-                //List<CfsBitmap> floorCfsBitmaps = file.Floors
-                //    .Select(f => AssetLibrary.FloorBitmaps
-                //    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
-                //    .ToList();
-
-                //List<CfsBitmap> objectCfsBitmaps = file.Objects
-                //    .Select(f => AssetLibrary.ObjectBitmaps
-                //    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
-                //    .ToList();
-
-                //Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, floorCfsBitmaps);
-                //Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, objectCfsBitmaps);
-
                 // Initialize the tiles and objects.
 
                 for (int i = 0; i < file.Width; i++)
@@ -89,8 +74,8 @@ namespace Tools.InfantryStudio
 
                         var tile = file.Tiles[j * file.Width + i];
 
-                        var blobName = file.Floors[tile.TerrainLookup].FileName;
-                        var cfsName = file.Floors[tile.TerrainLookup].Id;
+                        var blobName = file.Floors[tile.TerrainLookup].FileName.ToLower().Trim();
+                        var cfsName = file.Floors[tile.TerrainLookup].Id.ToLower().Trim();
 
                         if (blobName == null)
                         {
