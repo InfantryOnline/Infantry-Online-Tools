@@ -66,7 +66,7 @@ namespace Tools.InfantryStudio.Assets
         private IEnumerable<CfsBitmap> LoadCfsBitmapFromBlob(LoadedBlobFile blob)
         {
             var entries = blob.BlobFile.Entries
-                .Where(e => e.Name.EndsWith(".cfs"))
+                .Where(e => e.Name.Trim().ToLower().EndsWith(".cfs"))
                 .SelectMany(e =>
                 {
                     using (var stream = new MemoryStream())

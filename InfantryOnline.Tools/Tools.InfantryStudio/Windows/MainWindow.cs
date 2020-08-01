@@ -109,8 +109,8 @@ namespace Tools.InfantryStudio
 
                     var obj = file.Objects[entity.ObjectId];
 
-                    var blobName = obj.FileName;
-                    var cfsName = obj.Id;
+                    var blobName = obj.FileName.ToLower().Trim();
+                    var cfsName = obj.Id.ToLower().Trim();
 
                     if (blobName == null)
                     {
@@ -166,8 +166,6 @@ namespace Tools.InfantryStudio
 
             Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.FloorBitmaps, "floors");
             Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps, "objects");
-
-            // TODO: Add a "cache" folder for atlasses.
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
