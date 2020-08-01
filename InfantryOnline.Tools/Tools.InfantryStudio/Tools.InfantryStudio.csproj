@@ -72,6 +72,12 @@
     <Compile Include="UserControls\MapUserControl.Designer.cs">
       <DependentUpon>MapUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Windows\CachingProgressWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\CachingProgressWindow.Designer.cs">
+      <DependentUpon>CachingProgressWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Windows\DoodadWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +109,9 @@
     </Compile>
     <EmbeddedResource Include="UserControls\MapUserControl.resx">
       <DependentUpon>MapUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\CachingProgressWindow.resx">
+      <DependentUpon>CachingProgressWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\DoodadWindow.resx">
       <DependentUpon>DoodadWindow.cs</DependentUpon>

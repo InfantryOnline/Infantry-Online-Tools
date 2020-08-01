@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,24 +20,30 @@ namespace Tools.InfantryStudio.Rendering.Atlas
         /// </remarks>
         /// <param name="bitmaps"></param>
         /// <returns></returns>
-        public static List<TextureAtlas> CreateAtlassesFromCfsBitmaps(RenderingDevice device, List<CfsBitmap> bitmaps)
+        public static List<TextureAtlas> CreateAtlassesFromCfsBitmaps(RenderingDevice device, List<CfsBitmap> bitmaps, string cacheFolder)
         {
+            // Big warning: we ignore the BlobFilename in DistinctBy because we have many blobs where assets repeat,
+            // so we assume if the name is the same, that the asset is the same.
+
             var orderedBitmaps = bitmaps
-                .DistinctBy(b => b.BloFilename + "#" + b.CfsFilename + "#" + b.FrameIndex)
+                .DistinctBy(b => b.CfsFilename + "#" + b.FrameIndex)
                 .OrderByDescending(b => (b.SpriteFile.Width * b.SpriteFile.Height))
                 .ToList();
 
             // Determine the most that we can pack in a 2048 by 2048 space, since each atlas is that large.
 
             List<TextureAtlas> output = new List<TextureAtlas>();
+            List<TextureAtlas> openList = new List<TextureAtlas>();
 
-            output.Add(new TextureAtlas());
+            var atlasId = 1;
+
+            openList.Add(new TextureAtlas {Id = atlasId++ });
 
             foreach(var bitmap in orderedBitmaps)
             {
                 bool foundSpace = false;
 
-                foreach(var atlas in output)
+                foreach(var atlas in openList)
                 {
                     var entry = atlas.FindSpaceForDimensions(bitmap.Bitmap.Width, bitmap.Bitmap.Height);
 
@@ -52,7 +59,7 @@ namespace Tools.InfantryStudio.Rendering.Atlas
 
                 if (!foundSpace)
                 {
-                    var atlas = new TextureAtlas();
+                    var atlas = new TextureAtlas { Id = atlasId++ };
                     var entry = atlas.FindSpaceForDimensions(bitmap.Bitmap.Width, bitmap.Bitmap.Height);
 
                     if (entry == null)
@@ -63,27 +70,34 @@ namespace Tools.InfantryStudio.Rendering.Atlas
                     entry.CfsBitmap = bitmap;
                     atlas.Entries.Add(entry);
 
-                    output.Add(atlas);
+                    openList.Add(atlas);
                 }
+
+                var lockedAtlassses = openList.Where(a => a.IsLocked).ToList();
+
+                // Create bitmaps for each atlas that we have finished, and add it to the cache proper.
+
+                foreach (var atlas in lockedAtlassses)
+                {
+                    var b = new Bitmap(2048, 2048);
+
+                    using (var gr = Graphics.FromImage(b))
+                    {
+                        foreach (var entry in atlas.Entries)
+                        {
+                            gr.DrawImage(entry.CfsBitmap.Bitmap, entry.X, entry.Y);
+                            entry.CfsBitmap.Bitmap = null; // No longer needed, free it up.
+                        }
+                    }
+
+                    b.Save($"{cacheFolder}_{atlas.Id}.png", ImageFormat.Png);
+
+                    openList.Remove(atlas);
+                }
+
+                output.AddRange(lockedAtlassses);
             }
             
-            // Create bitmaps and textures for each atlas.
-
-            foreach(var atlas in output)
-            {
-                var b = new Bitmap(2048, 2048);
-
-                using (var gr = Graphics.FromImage(b))
-                {
-                    foreach (var entry in atlas.Entries)
-                    {
-                        gr.DrawImage(entry.CfsBitmap.Bitmap, entry.X, entry.Y);
-                    }
-                }
-
-                atlas.Bitmap = b;
-            }
-
             return output;
         }
     }

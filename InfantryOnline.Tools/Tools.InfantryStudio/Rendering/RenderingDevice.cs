@@ -36,11 +36,5 @@ namespace Tools.InfantryStudio.Rendering
         {
 
         }
-
-        #region Private
-
-
-
-        #endregion  
     }
 }

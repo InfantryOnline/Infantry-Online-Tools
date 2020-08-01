@@ -27,6 +27,11 @@ namespace Tools.InfantryStudio.Rendering.Atlas
     public class TextureAtlas
     {
         /// <summary>
+        /// Gets or sets the unique identifier for this atlas, within a group of atlasses.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
         /// Gets the width of this atlas, in pixels.
         /// </summary>
         public int Width { get { return 2048; } }
@@ -37,9 +42,9 @@ namespace Tools.InfantryStudio.Rendering.Atlas
         public int Height { get { return 2048; } }
 
         /// <summary>
-        /// Gets or sets the bitmap for this atlas. Useful for debugging if any issues should arise.
+        /// Returns true if this atlas is locked and no longer accepting new entries.
         /// </summary>
-        public Bitmap Bitmap { get; set; }
+        public bool IsLocked { get { return findingAttempts > 32; } }
 
         /// <summary>
         /// All the entries in this atlas.
@@ -59,6 +64,12 @@ namespace Tools.InfantryStudio.Rendering.Atlas
         /// <returns></returns>
         public TextureAtlasEntry FindSpaceForDimensions(int w, int h)
         {
+            if (IsLocked)
+            {
+                // Treat the atlas as "locked", because at this point we are very unlikely to find space.
+                return null;
+            }
+
             if (Entries.Count == 0)
             {
                 // First time inserting anything, so only check top left.
@@ -133,9 +144,12 @@ namespace Tools.InfantryStudio.Rendering.Atlas
                 }
                 else
                 {
+                    findingAttempts++;
                     return null;
                 }
             }
         }
+
+        private int findingAttempts = 0;
     }
 }

@@ -6,12 +6,14 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tools.InfantryStudio.Assets;
 using Tools.InfantryStudio.Rendering;
 using Tools.InfantryStudio.Rendering.Atlas;
+using Tools.InfantryStudio.Windows;
 
 namespace Tools.InfantryStudio
 {
@@ -64,46 +66,125 @@ namespace Tools.InfantryStudio
 
                 // Preallocate all the atlasses needed for this level based on the references.
 
-                List<CfsBitmap> floorCfsBitmaps = file.Floors
-                    .Select(f => AssetLibrary.FloorBitmaps
-                    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
-                    .ToList();
+                //List<CfsBitmap> floorCfsBitmaps = file.Floors
+                //    .Select(f => AssetLibrary.FloorBitmaps
+                //    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
+                //    .ToList();
 
-                List<CfsBitmap> objectCfsBitmaps = file.Objects
-                    .Select(f => AssetLibrary.ObjectBitmaps
-                    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
-                    .ToList();
+                //List<CfsBitmap> objectCfsBitmaps = file.Objects
+                //    .Select(f => AssetLibrary.ObjectBitmaps
+                //    .Find(fb => fb.BloFilename == f.FileName && fb.CfsFilename == f.Id))
+                //    .ToList();
 
-                Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, floorCfsBitmaps);
-                Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, objectCfsBitmaps);
+                //Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, floorCfsBitmaps);
+                //Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, objectCfsBitmaps);
 
                 // Initialize the tiles and objects.
 
+                for (int i = 0; i < file.Width; i++)
+                {
+                    for (int j = 0; j < file.Height; j++)
+                    {
+                        // Map across the floor array and into the atlas, because we don't care where the data really comes from.
 
+                        var tile = file.Tiles[j * file.Width + i];
+
+                        var blobName = file.Floors[tile.TerrainLookup].FileName;
+                        var cfsName = file.Floors[tile.TerrainLookup].Id;
+
+                        if (blobName == null)
+                        {
+                            // Dealing with a shady file. Deal with this later.
+                            throw new NotImplementedException("Deal with this later.");
+                        }
+
+                        CfsBitmap cfs = null;
+
+                        foreach(var atlas in Renderer.FloorAtlasses)
+                        {
+                            // Warning: We aren't checking Blobs because of duplicate entries in some blobs; just the CFS.
+
+                            var foundCfs = atlas.Entries.FirstOrDefault(entry => entry.CfsBitmap.CfsFilename == cfsName);
+
+                            if (foundCfs != null)
+                            {
+                                cfs = foundCfs.CfsBitmap;
+                                break;
+                            }
+                        }
+
+                        if (cfs == null)
+                        {
+                            throw new NotImplementedException("What do we do here?");
+                        }
+                    }
+                }
+
+                foreach(var entity in file.Entities)
+                {
+                    // Map across the Objects array and into the atlas, because we don't care where the data really comes from.
+
+                    var obj = file.Objects[entity.ObjectId];
+
+                    var blobName = obj.FileName;
+                    var cfsName = obj.Id;
+
+                    if (blobName == null)
+                    {
+                        // Dealing with a shady file. Deal with this later.
+                        throw new NotImplementedException("Deal with this later.");
+                    }
+
+                    CfsBitmap cfs = null;
+
+                    foreach (var atlas in Renderer.ObjectAtlasses)
+                    {
+                        // Warning: We aren't checking Blobs because of duplicate entries in some blobs; just the CFS.
+                        var foundCfs = atlas.Entries
+                            .FirstOrDefault(entry => entry.CfsBitmap.CfsFilename == cfsName
+                            && entry.CfsBitmap.FrameIndex == entity.FrameIndex);
+
+                        if (foundCfs != null)
+                        {
+                            cfs = foundCfs.CfsBitmap;
+                            break;
+                        }
+                    }
+
+                    if (cfs == null)
+                    {
+                        throw new NotImplementedException("What do we do here?");
+                    }
+                }
             }
         }
 
+        //private async void InitializeCache()
+        //{
+        //    await Task.Delay(1000);
+
+        //    var cachingProgressWindow = new CachingProgressWindow();
+
+        //    cachingProgressWindow.SetCurrentProgress(50);
+        //    cachingProgressWindow.SetTotalProgress(100);
+
+        //    cachingProgressWindow.StartPosition = FormStartPosition.CenterParent;
+        //    cachingProgressWindow.ShowDialog(this);
+        //}
+
         private void InitializeAssetLibraryCache()
         {
-            // TODO: Move asset library initialization to a separate thread so it's not blocking the UI.
+            //InitializeCache();
+
+            //return;
 
             AssetLibrary = new AssetLibrary();
             AssetLibrary.Initialize();
 
-            var floorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.FloorBitmaps);
-            var objectAtlassses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps);
+            Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.FloorBitmaps, "floors");
+            Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps, "objects");
 
-            // Debug printout of maps into the working dir.
-
-            for(var i = 0; i < floorAtlasses.Count; i++)
-            {
-                floorAtlasses[i].Bitmap.Save($"Floor_{i}.png", ImageFormat.Png);
-            }
-
-            for (var i = 0; i < objectAtlassses.Count; i++)
-            {
-                objectAtlassses[i].Bitmap.Save($"Object_{i}.png", ImageFormat.Png);
-            }
+            // TODO: Add a "cache" folder for atlasses.
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)

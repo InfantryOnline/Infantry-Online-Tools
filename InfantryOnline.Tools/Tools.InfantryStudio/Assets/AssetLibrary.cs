@@ -23,14 +23,14 @@ namespace Tools.InfantryStudio.Assets
 
             FloorBitmaps = Directory
                     .EnumerateFiles(blobDirectory, "*.blo", SearchOption.AllDirectories)
-                    .Where(s => Path.GetFileName(s).StartsWith("f_") && !Path.GetFileName(s).EndsWith(".lvb.blo"))
+                    .Where(s => Path.GetFileName(s).StartsWith("f_"))
                     .Select(LoadBlobFile)
                     .SelectMany(LoadCfsBitmapFromBlob)
                     .ToList();
 
             ObjectBitmaps = Directory
                     .EnumerateFiles(blobDirectory, "*.blo", SearchOption.AllDirectories)
-                    .Where(s => Path.GetFileName(s).StartsWith("o_") && !Path.GetFileName(s).EndsWith(".lvb.blo"))
+                    .Where(s => Path.GetFileName(s).StartsWith("o_"))
                     .Select(LoadBlobFile)
                     .SelectMany(LoadCfsBitmapFromBlob)
                     .ToList();
@@ -65,7 +65,7 @@ namespace Tools.InfantryStudio.Assets
 
         private IEnumerable<CfsBitmap> LoadCfsBitmapFromBlob(LoadedBlobFile blob)
         {
-            return blob.BlobFile.Entries
+            var entries = blob.BlobFile.Entries
                 .Where(e => e.Name.EndsWith(".cfs"))
                 .SelectMany(e =>
                 {
@@ -81,7 +81,12 @@ namespace Tools.InfantryStudio.Assets
 
                         return CfsBitmap.FromSpriteFile(spriteFile, blob.BlobName, e.Name);
                     }
-                });
+                }).ToList();
+
+            blob.Stream.Close();
+            blob.Stream.Dispose();
+
+            return entries;
         }
     }
 }
