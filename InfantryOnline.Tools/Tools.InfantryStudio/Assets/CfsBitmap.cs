@@ -104,7 +104,19 @@ namespace Tools.InfantryStudio.Assets
 
             // Next, parse all the frames.
 
-            for (var i = 0; i < sprite.Frames.Count(); i++)
+            var frameCount = 1;
+
+            if (sprite.RowMeaning != 0)
+            {
+                frameCount = sprite.Frames.Count();
+            }
+
+            if (sprite.Frames.Count() == 0)
+            {
+                frameCount = 0;
+            }
+
+            for (var i = 0; i < frameCount; i++)
             {
                 var frame = sprite.Frames[i];
 
