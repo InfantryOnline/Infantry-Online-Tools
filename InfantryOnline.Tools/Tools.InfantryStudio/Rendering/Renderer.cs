@@ -27,6 +27,11 @@ namespace Tools.InfantryStudio.Rendering
 
         public List<TextureAtlas> UserInterfaceAtlasses;
 
+        public Renderer()
+        {
+            FloorRenderer = new FloorRenderer(this);
+        }
+
         public void Initialize(Control control)
         {
 

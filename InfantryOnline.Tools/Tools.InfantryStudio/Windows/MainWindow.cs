@@ -66,10 +66,23 @@ namespace Tools.InfantryStudio
 
                 // Initialize the tiles and objects.
 
+
+                // Most tiles will only have a handful of atlas lookups, so rather than going through the whole thing,
+                // use a dictionary and make quick work of it.
+                Dictionary<string, Tuple<int, int>> atlasLookup = new Dictionary<string, Tuple<int, int>>();
+
                 for (int i = 0; i < file.Width; i++)
                 {
                     for (int j = 0; j < file.Height; j++)
                     {
+
+                        // TODO: Deal with this. Why are some maps so bloody large?
+
+                        if (i >= 2048 || j >= 2048)
+                        {
+                            continue;
+                        }
+
                         // Map across the floor array and into the atlas, because we don't care where the data really comes from.
 
                         var tile = file.Tiles[j * file.Width + i];
@@ -83,90 +96,95 @@ namespace Tools.InfantryStudio
                             throw new NotImplementedException("Deal with this later.");
                         }
 
-                        CfsBitmap cfs = null;
+                        var dictKey = $"{blobName}#{cfsName}";
 
-                        foreach(var atlas in Renderer.FloorAtlasses)
+                        var atlasIndex = -1;
+                        var atlasEntryIndex = -1;
+
+                        if (!atlasLookup.ContainsKey(dictKey))
                         {
-                            var foundCfs = atlas.Entries.FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName && entry.CfsBitmap.CfsFilename == cfsName);
-
-                            if (foundCfs != null)
+                            foreach (var atlas in Renderer.FloorAtlasses)
                             {
-                                cfs = foundCfs.CfsBitmap;
-                                break;
+                                var foundCfs = atlas.Entries.FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName && entry.CfsBitmap.CfsFilename == cfsName);
+
+                                if (foundCfs != null)
+                                {
+                                    atlasIndex = Renderer.FloorAtlasses.IndexOf(atlas);
+                                    atlasEntryIndex = atlas.Entries.IndexOf(foundCfs);
+
+                                    break;
+                                }
                             }
+
+                            atlasLookup[dictKey] = new Tuple<int, int>(atlasIndex, atlasEntryIndex);
+                        }
+                        else
+                        {
+                            atlasIndex = atlasLookup[dictKey].Item1;
+                            atlasEntryIndex = atlasLookup[dictKey].Item2;
                         }
 
-                        if (cfs == null)
+                        if (atlasIndex == -1 || atlasEntryIndex == -1)
                         {
-                            throw new NotImplementedException("What do we do here?");
+                            throw new NotImplementedException("Atlas entry not found!");
                         }
+
+                        Renderer.FloorRenderer.UpdateTileAtGlobalCoordinate(i, j, atlasIndex, atlasEntryIndex);
                     }
                 }
 
-                foreach(var entity in file.Entities)
-                {
-                    // Map across the Objects array and into the atlas, because we don't care where the data really comes from.
 
-                    var obj = file.Objects[entity.ObjectId];
+                // TODO: Code below works,but get the tiles to render first.
 
-                    var blobName = obj.FileName.ToLower().Trim();
-                    var cfsName = obj.Id.ToLower().Trim();
+                //foreach(var entity in file.Entities)
+                //{
+                //    // Map across the Objects array and into the atlas, because we don't care where the data really comes from.
 
-                    if (blobName == null)
-                    {
-                        // Dealing with a shady file. Deal with this later.
-                        throw new NotImplementedException("Deal with this later.");
-                    }
+                //    var obj = file.Objects[entity.ObjectId];
 
-                    CfsBitmap cfs = null;
+                //    var blobName = obj.FileName.ToLower().Trim();
+                //    var cfsName = obj.Id.ToLower().Trim();
 
-                    foreach (var atlas in Renderer.ObjectAtlasses)
-                    {
-                        var foundCfs = atlas.Entries
-                            .FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName
-                            && entry.CfsBitmap.CfsFilename == cfsName
-                            && entry.CfsBitmap.FrameIndex == entity.FrameIndex);
+                //    if (blobName == null)
+                //    {
+                //        // Dealing with a shady file. Deal with this later.
+                //        throw new NotImplementedException("Deal with this later.");
+                //    }
 
-                        if (foundCfs != null)
-                        {
-                            cfs = foundCfs.CfsBitmap;
-                            break;
-                        }
-                    }
+                //    CfsBitmap cfs = null;
 
-                    if (cfs == null)
-                    {
-                        throw new NotImplementedException("What do we do here?");
-                    }
-                }
+                //    foreach (var atlas in Renderer.ObjectAtlasses)
+                //    {
+                //        var foundCfs = atlas.Entries
+                //            .FirstOrDefault(entry => entry.CfsBitmap.BloFilename == blobName
+                //            && entry.CfsBitmap.CfsFilename == cfsName
+                //            && entry.CfsBitmap.FrameIndex == entity.FrameIndex);
+
+                //        if (foundCfs != null)
+                //        {
+                //            cfs = foundCfs.CfsBitmap;
+                //            break;
+                //        }
+                //    }
+
+                //    if (cfs == null)
+                //    {
+                //        throw new NotImplementedException("What do we do here?");
+                //    }
+                //}
             }
         }
 
-        //private async void InitializeCache()
-        //{
-        //    await Task.Delay(1000);
-
-        //    var cachingProgressWindow = new CachingProgressWindow();
-
-        //    cachingProgressWindow.SetCurrentProgress(50);
-        //    cachingProgressWindow.SetTotalProgress(100);
-
-        //    cachingProgressWindow.StartPosition = FormStartPosition.CenterParent;
-        //    cachingProgressWindow.ShowDialog(this);
-        //}
-
         private void InitializeAssetLibraryCache()
         {
-            //InitializeCache();
-
-            //return;
-
             AssetLibrary = new AssetLibrary();
             AssetLibrary.Initialize();
 
             Renderer.UserInterfaceAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.UserInterfaceBitmaps, "ui");
             Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.FloorBitmaps, "floors");
-            Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps, "objects");
+
+            // TODO: Code below works, but get the tiles to render first.
+            // Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps, "objects");
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
