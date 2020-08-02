@@ -87,7 +87,7 @@ namespace Gibbed.Infantry.FileFormats
 
         public struct Entry
         {
-            public string Name;
+            public string Name { get; set; }
             public long Offset;
             public uint Size;
         }

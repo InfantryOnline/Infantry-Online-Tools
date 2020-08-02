@@ -34,11 +34,15 @@ namespace Tools.InfantryStudio.Assets
                     .Select(LoadBlobFile)
                     .SelectMany(LoadCfsBitmapFromBlob)
                     .ToList();
+
+            UserInterfaceBitmaps = LoadCfsBitmapFromBlob(LoadBlobFile(Path.Combine(blobDirectory, "uiart.blo"))).ToList();
         }
 
         public List<CfsBitmap> FloorBitmaps { get; set; } = new List<CfsBitmap>();
 
         public List<CfsBitmap> ObjectBitmaps { get; set; } = new List<CfsBitmap>();
+
+        public List<CfsBitmap> UserInterfaceBitmaps { get; set; } = new List<CfsBitmap>();
 
         private LoadedBlobFile LoadBlobFile(string path)
         {

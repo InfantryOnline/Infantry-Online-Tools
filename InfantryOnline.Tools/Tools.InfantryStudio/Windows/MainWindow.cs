@@ -164,6 +164,7 @@ namespace Tools.InfantryStudio
             AssetLibrary = new AssetLibrary();
             AssetLibrary.Initialize();
 
+            Renderer.UserInterfaceAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.UserInterfaceBitmaps, "ui");
             Renderer.FloorAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.FloorBitmaps, "floors");
             Renderer.ObjectAtlasses = TextureAtlasFactory.CreateAtlassesFromCfsBitmaps(Renderer.RenderingDevice, AssetLibrary.ObjectBitmaps, "objects");
         }

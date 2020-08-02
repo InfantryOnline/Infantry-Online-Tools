@@ -25,6 +25,8 @@ namespace Tools.InfantryStudio.Rendering
 
         public List<TextureAtlas> ObjectAtlasses { get; set; } = new List<TextureAtlas>();
 
+        public List<TextureAtlas> UserInterfaceAtlasses;
+
         public void Initialize(Control control)
         {
 
